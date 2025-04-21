@@ -61,6 +61,7 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group" role="group">
+                                  {% if request.user.is_authenticated and request.user.role in 'ADMIN,MANAGER' %}
                                     {% if lead.status == 'POTENTIAL' %}
                                     <form method="post" action="{% url 'lead_activate' lead.pk %}" class="d-inline">
                                         {% csrf_token %}
@@ -78,6 +79,7 @@
                                         </button>
                                     </form>
                                     {% endif %}
+                                  {% endif %}
 
                                     <a href="{% url 'lead_detail' lead.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         <i class="fas fa-eye"></i>

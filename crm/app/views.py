@@ -142,17 +142,21 @@ class LeadDeactivateView(generic.UpdateView):
         return reverse('lead_list')
 
 
-
+@method_decorator(role_required('ADMIN', 'MANAGER'), name='dispatch')
 class ActiveClientListView(generic.ListView):
     model = ActiveClient
     template_name = 'app/activeclient_list.html'
     context_object_name = 'clients'
     paginate_by = 10
 
+
+@method_decorator(role_required('ADMIN', 'MANAGER'), name='dispatch')
 class ActiveClientDetailView(generic.DetailView):
     model = ActiveClient
     template_name = 'app/activeclient_detail.html'
 
+
+@method_decorator(role_required('ADMIN', 'MANAGER'), name='dispatch')
 class ActiveClientCreateView(generic.CreateView):
     model = ActiveClient
     form_class = ActiveClientForm
@@ -165,6 +169,8 @@ class ActiveClientCreateView(generic.CreateView):
             initial['lead'] = self.request.GET.get('lead_id')
         return initial
 
+
+@method_decorator(role_required('ADMIN', 'MANAGER'), name='dispatch')
 class ActiveClientUpdateView(generic.UpdateView):
     model = ActiveClient
     form_class = ActiveClientForm
@@ -173,6 +179,8 @@ class ActiveClientUpdateView(generic.UpdateView):
     def get_success_url(self):
         return reverse('activeclient_detail', kwargs={'pk': self.object.pk})
 
+
+@method_decorator(role_required('ADMIN', 'MANAGER'), name='dispatch')
 class ActiveClientDeleteView(generic.DeleteView):
     model = ActiveClient
     template_name = 'app/activeclient_confirm_delete.html'
