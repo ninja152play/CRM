@@ -20,7 +20,7 @@
 Установка
 =======
 1. ```git clone https://github.com/ninja152play/Dgano-site.git```
-2. ```cd Django-site```
+2. ```cd CRM```
 3. ```docker build -t django-app .```
 
 Запуск
@@ -32,7 +32,6 @@
 
 ## Роли пользователей
 
-В системе должны быть преднастроенные роли пользователей.
 
 Администратор может создавать, просматривать и редактировать пользователей, назначать им роли и разрешения. Такой функционал реализует административная панель Django.
 
@@ -58,7 +57,7 @@
 
 2. ```docker exec -it CONTAINER ID /bin/bash```
 
-3. ```cd megano```
+3. ```cd crm```
 
 4. ```python manage.py createsuperuser```
 
