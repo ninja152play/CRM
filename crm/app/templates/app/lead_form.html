@@ -1,0 +1,182 @@
+{% extends 'app/base.html' %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5 fw-bold text-gradient">
+                    <i class="fas fa-user-plus me-3"></i>Создание нового лида
+                </h1>
+                <a href="{% url 'lead_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-1"></i>Назад к списку
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-hover">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-info-circle me-2"></i>Основная информация</h5>
+                </div>
+                <div class="card-body px-4 pt-0 pb-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Общие ошибки формы -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger rounded-3 mb-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Поле ФИО -->
+                        <div class="mb-4">
+                            <label for="{{ form.full_name.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-user me-2 text-primary"></i>ФИО
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-signature text-muted"></i></span>
+                                {{ form.full_name }}
+                            </div>
+                            {% if form.full_name.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.full_name.errors|first }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Поле Телефон -->
+                        <div class="mb-4">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-phone me-2 text-primary"></i>Телефон
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-mobile-alt text-muted"></i></span>
+                                {{ form.phone }}
+                            </div>
+                            {% if form.phone.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.phone.errors|first }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Поле Email -->
+                        <div class="mb-4">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-envelope me-2 text-primary"></i>Email
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-at text-muted"></i></span>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.email.errors|first }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Поле Кампания -->
+                        <div class="mb-4">
+                            <label for="{{ form.campaign.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-bullhorn me-2 text-primary"></i>Кампания
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-project-diagram text-muted"></i></span>
+                                {{ form.campaign }}
+                            </div>
+                            {% if form.campaign.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.campaign.errors|first }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+
+
+                        <div class="d-flex justify-content-between mt-5 pt-3 border-top">
+                            <a href="{% url 'lead_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-times me-1"></i> Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="fas fa-save me-1"></i> Сохранить лид
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .shadow-hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .shadow-hover:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .form-check-input:checked {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .badge {
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .form-check-input:checked + label .badge {
+        box-shadow: 0 0 0 2px #4361ee;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+
+    .form-control, .form-select {
+        border-left: none;
+    }
+</style>
+
+<script>
+    // Валидация формы
+    (function() {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}

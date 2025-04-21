@@ -1,0 +1,183 @@
+{% extends 'app/base.html' %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
+                <!-- Заголовок с градиентом -->
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-bullhorn me-2"></i>Создание новой кампании
+                        </h2>
+                        <a href="{% url 'campaign_list' %}" class="btn btn-light btn-sm rounded-pill">
+                            <i class="fas fa-arrow-left me-1"></i> Назад
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Тело формы -->
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" novalidate class="needs-validation">
+                        {% csrf_token %}
+
+                        <!-- Общие ошибки формы -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger rounded-3 mb-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Название кампании -->
+                        <div class="mb-4">
+                            <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-tag me-2 text-primary"></i>Название кампании
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-heading text-muted"></i></span>
+                                {{ form.name }}
+                            </div>
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.name.errors|first }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted ms-4">Например: "Летнее предложение 2023"</small>
+                        </div>
+
+                        <!-- Услуги с чекбоксами -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-spa me-2 text-primary"></i>Услуги в кампании
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select
+                                class="form-select"
+                                id="{{ form.services.id_for_label }}"
+                                name="{{ form.services.name }}"
+                                multiple
+                                size="5"  <!-- Показывает 5 строк без прокрутки -->
+                                aria-describedby="servicesHelp"
+                            >
+                                {% for service in form.services %}
+                                    <option value="{{ service.data.value }}">{{ service.choice_label }}</option>
+                                {% endfor %}
+                            </select>
+                            <small id="servicesHelp" class="form-text text-muted">
+                                Удерживайте Ctrl/Cmd для выбора нескольких услуг
+                            </small>
+                            {% if form.services.errors %}
+                                <div class="invalid-feedback d-block mt-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>{{ form.services.errors|first }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+
+                        <!-- Канал продвижения -->
+                        <div class="mb-4">
+                            <label for="{{ form.channel.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-broadcast-tower me-2 text-primary"></i>Канал продвижения
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-wifi text-muted"></i></span>
+                                {{ form.channel }}
+                            </div>
+                            {% if form.channel.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.channel.errors|first }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted ms-4">Например: "Соцсети", "Поисковики"</small>
+                        </div>
+
+                        <!-- Бюджет -->
+                        <div class="mb-4">
+                            <label for="{{ form.budget.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-wallet me-2 text-primary"></i>Бюджет
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-money-bill-wave text-muted"></i></span>
+                                {{ form.budget }}
+                                <span class="input-group-text">₽</span>
+                            </div>
+                            {% if form.budget.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>{{ form.budget.errors|first }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted ms-4">Общий бюджет кампании в рублях</small>
+                        </div>
+
+                        <!-- Кнопки действий -->
+                        <div class="d-flex justify-content-between mt-5 pt-3 border-top">
+                            <a href="{% url 'campaign_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-times me-1"></i> Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="fas fa-check-circle me-1"></i> Создать кампанию
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Стили остаются без изменений -->
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-control, .form-select, .input-group-text {
+        border-radius: 0.5rem !important;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .btn-primary:hover {
+        background-color: #3a56d4;
+        border-color: #3a56d4;
+        transform: translateY(-2px);
+    }
+
+    .form-check-input:checked {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}

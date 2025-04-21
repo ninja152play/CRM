@@ -1,0 +1,169 @@
+{% extends 'app/base.html' %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold text-gradient">
+            <i class="fas fa-bullhorn me-3"></i>Наши рекламные кампании
+        </h1>
+        {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+        <a href="{% url 'campaign_create' %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+            <i class="fas fa-plus me-2"></i>Добавить кампанию
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        {% for campaign in object_list %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-hover">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h3 class="h5 mb-0">{{ campaign.name }}</h3>
+                        <span class="badge bg-primary-soft text-primary rounded-pill fs-6">
+                            {{ campaign.budget }} ₽
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body px-4 pt-2 pb-4">
+                    <!-- Блок с каналом продвижения -->
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-broadcast-tower text-muted me-2"></i>
+                        <span class="text-muted">Канал:</span>
+                        <span class="ms-2 fw-medium">{{ campaign.channel }}</span>
+                    </div>
+
+                    <!-- Блок с услугами -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-spa text-muted me-2"></i>
+                            <span class="text-muted">Услуги:</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for service in campaign.services.all %}
+                            <span class="badge bg-light text-dark rounded-pill">
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                {{ service.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Блок с бюджетом -->
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-wallet text-muted me-2"></i>
+                        <span class="text-muted">Бюджет:</span>
+                        <span class="ms-2 fw-medium">{{ campaign.budget }} ₽</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a href="{% url 'campaign_detail' campaign.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            Подробнее <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                        {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill dropdown-toggle px-3"
+                                    type="button"
+                                    id="dropdownMenuButton{{ campaign.id }}"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                Действия
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ campaign.id }}">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'campaign_update' campaign.pk %}">
+                                        <i class="fas fa-edit me-2"></i>Редактировать
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ campaign.id }}">
+                                        <i class="fas fa-trash-alt me-2"></i>Удалить
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ campaign.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Подтверждение удаления</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Вы уверены, что хотите удалить кампанию "{{ campaign.name }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form action="{% url 'campaign_delete' campaign.pk %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card border-0 text-center p-5">
+                <div class="card-body">
+                    <i class="fas fa-bullhorn fa-4x text-muted mb-4"></i>
+                    <h3 class="h4">Кампании не найдены</h3>
+                    <p class="text-muted mb-4">Здесь будут отображаться ваши рекламные кампании</p>
+                    {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+                    <a href="{% url 'campaign_create' %}" class="btn btn-primary px-4">
+                        <i class="fas fa-plus me-2"></i>Создать первую кампанию
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .shadow-hover:hover {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+    }
+
+    .bg-primary-soft {
+        background-color: rgba(67, 97, 238, 0.1);
+    }
+
+    .badge {
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+    }
+
+    .service-badge {
+        transition: all 0.2s ease;
+    }
+
+    .service-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

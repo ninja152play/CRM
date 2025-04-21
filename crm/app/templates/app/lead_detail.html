@@ -1,0 +1,157 @@
+{% extends 'app/base.html' %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5 fw-bold text-gradient">
+                    <i class="fas fa-user-tie me-3"></i>Детали лида
+                </h1>
+                <div>
+                    {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+                    <a href="{% url 'lead_update' object.pk %}" class="btn btn-primary me-2 rounded-pill px-4">
+                        <i class="fas fa-edit me-1"></i>Редактировать
+                    </a>
+                    <button type="button" class="btn btn-danger rounded-pill px-4"
+                            onclick="showDeleteModal('{{ object.full_name|escapejs }}', '{% url 'lead_delete' object.pk %}')">
+                        <i class="fas fa-trash me-1"></i>Удалить
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-hover">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-info-circle me-2"></i>Основная информация</h5>
+                </div>
+                <div class="card-body px-4 pt-0 pb-4">
+                    <div class="row align-items-center mb-3 py-3 border-bottom">
+                        <div class="col-md-4 fw-bold text-muted">ФИО:</div>
+                        <div class="col-md-8">{{ object.full_name }}</div>
+                    </div>
+
+                    <div class="row align-items-center mb-3 py-3 border-bottom">
+                        <div class="col-md-4 fw-bold text-muted">Телефон:</div>
+                        <div class="col-md-8">
+                            <a href="tel:{{ object.phone }}" class="text-decoration-none">
+                                {{ object.phone }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3 py-3 border-bottom">
+                        <div class="col-md-4 fw-bold text-muted">Email:</div>
+                        <div class="col-md-8">
+                            <a href="mailto:{{ object.email }}" class="text-decoration-none">
+                                {{ object.email }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3 py-3 border-bottom">
+                        <div class="col-md-4 fw-bold text-muted">Кампания:</div>
+                        <div class="col-md-8">
+                            <a href="{% url 'campaign_detail' object.campaign.pk %}" class="text-decoration-none">
+                                {{ object.campaign.name }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center py-3">
+                        <div class="col-md-4 fw-bold text-muted">Статус:</div>
+                        <div class="col-md-8">
+                            {% if object.status == 'ACTIVE' %}
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="fas fa-check-circle me-1"></i>Активный
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning rounded-pill px-3 py-2">
+                                    <i class="fas fa-hourglass-half me-1"></i>Потенциальный
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'lead_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-1"></i>Вернуться к списку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteModalText"></p>
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Это действие нельзя отменить!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Отмена</button>
+                <form method="POST" id="deleteForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="fas fa-trash me-1"></i>Удалить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .shadow-hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .shadow-hover:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+</style>
+
+<script>
+    function showDeleteModal(name, deleteUrl) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        const modalText = document.getElementById('deleteModalText');
+        const deleteForm = document.getElementById('deleteForm');
+
+        modalText.textContent = `Вы уверены, что хотите удалить лида "${name}"?`;
+        deleteForm.action = deleteUrl;
+
+        modal.show();
+    }
+</script>
+{% endblock %}

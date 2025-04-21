@@ -1,0 +1,145 @@
+{% extends 'app/base.html' %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5 fw-bold text-gradient">
+                    <i class="fas fa-file-contract me-3"></i>Контракт: {{ object.name }}
+                </h1>
+                <div>
+                    {% if request.user.is_authenticated and request.user.role in 'ADMIN,MANAGER' %}
+                    <a href="{% url 'contract_update' object.pk %}" class="btn btn-primary me-2 rounded-pill px-4">
+                        <i class="fas fa-edit me-1"></i>Редактировать
+                    </a>
+                    <button type="button" class="btn btn-danger rounded-pill px-4"
+                            onclick="showDeleteModal('{{ object.name|escapejs }}', '{% url 'contract_delete' object.pk %}')">
+                        <i class="fas fa-trash me-1"></i>Удалить
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold text-muted">Название:</div>
+                        <div class="col-md-8">{{ object.name }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold text-muted">Услуга:</div>
+                        <div class="col-md-8">
+                            <a href="{% url 'service_detail' object.service.pk %}" class="text-decoration-none">
+                                {{ object.service.name }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold text-muted">Клиент:</div>
+                        <div class="col-md-8">
+                            <a href="{% url 'lead_detail' object.lead.pk %}" class="text-decoration-none">
+                                {{ object.lead.full_name }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold text-muted">Срок действия:</div>
+                        <div class="col-md-8">
+                            {{ object.start_date|date:"d.m.Y" }} - {{ object.end_date|date:"d.m.Y" }}
+                            <span class="badge {% if object.is_active %}bg-success{% else %}bg-secondary{% endif %} ms-2">
+                                {% if object.is_active %}Активен{% else %}Завершен{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold text-muted">Сумма:</div>
+                        <div class="col-md-8 fw-bold text-success">{{ object.amount }} ₽</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 fw-bold text-muted">Документ:</div>
+                        <div class="col-md-8">
+                            <a href="{{ object.document.url }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="fas fa-file-download me-1"></i> Скачать
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'contract_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-1"></i>Назад к списку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteModalText"></p>
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Это действие нельзя отменить!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Отмена</button>
+                <form method="POST" id="deleteForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="fas fa-trash me-1"></i>Удалить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .row {
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .row:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<script>
+    function showDeleteModal(name, deleteUrl) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        const modalText = document.getElementById('deleteModalText');
+        const deleteForm = document.getElementById('deleteForm');
+
+        modalText.textContent = `Вы уверены, что хотите удалить контракт "${name}"?`;
+        deleteForm.action = deleteUrl;
+
+        modal.show();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'app/base.html' %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold text-gradient">
+            <i class="fas fa-spa me-3"></i>Наши услуги
+        </h1>
+        {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+        <a href="{% url 'service_create' %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+            <i class="fas fa-plus me-2"></i>Добавить услугу
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        {% for service in object_list %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-hover">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h3 class="h5 mb-0">
+                                {{ service.name }}
+                        </h3>
+                        <span class="badge bg-primary-soft text-primary rounded-pill fs-6">
+                            {{ service.price }} ₽
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body px-4 pt-2 pb-4">
+                    <p class="text-muted mb-3">
+                        {{ service.description|truncatechars:120|default:"Описание отсутствует" }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'service_detail' service.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            Подробнее <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                        {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+                        <div class="dropdown">
+                            <button class="dropdown-item" onclick="location.href='{% url 'service_update' service.pk %}'">
+                                <i class="fas fa-edit me-2"></i>Редактировать
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        {% empty %}
+        <div class="col-12">
+            <div class="card border-0 text-center p-5">
+                <div class="card-body">
+                    <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+                    <h3 class="h4">Услуги не найдены</h3>
+                    <p class="text-muted mb-4">Здесь будут отображаться ваши услуги</p>
+                    {% if request.user.is_authenticated and request.user.role in 'ADMIN,MARKETER' %}
+                    <a href="{% url 'service_create' %}" class="btn btn-primary px-4">
+                        <i class="fas fa-plus me-2"></i>Создать первую услугу
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .shadow-hover:hover {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+    }
+
+    .bg-primary-soft {
+        background-color: rgba(67, 97, 238, 0.1);
+    }
+
+    .badge {
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
